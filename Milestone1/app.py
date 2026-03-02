@@ -1,12 +1,6 @@
 import streamlit as st
-import pickle
-import re
-import string
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from datetime import datetime
 
 # ==========================================
 # PAGE CONFIG
@@ -177,74 +171,26 @@ st.markdown("""
 # LOGIC LINKAGE (YOUR APP.PY CORE)
 # ==========================================
 
-SENSATIONAL_WORDS = {"shocking", "unbelievable", "explosive", "disaster", "nightmare", "chaos", "outrageous", "incredible", "terrifying", "horrifying"}
-HYPERBOLE_WORDS = {"always", "never", "everyone", "no one", "worst ever", "best ever", "guaranteed", "totally"}
-CLICKBAIT_PATTERNS = [r"you won'?t believe", r"what happens next", r"number \d+", r"this is what happened", r"will blow your mind"]
-
-@st.cache_resource
-def load_assets():
-    import os
-    from sklearn.utils.validation import check_is_fitted
-    
-    # Get the directory of the current script
-    current_dir = os.path.dirname(__file__)
-    m_path = os.path.join(current_dir, "model.pkl")
-    v_path = os.path.join(current_dir, "vectorizer.pkl")
-    
-    # Debug: Print found paths to logs
-    print(f"[BOOT] Current Dir: {current_dir}")
-    print(f"[BOOT] Checking Model: {os.path.exists(m_path)}")
-    print(f"[BOOT] Checking Vectorizer: {os.path.exists(v_path)}")
-    
-    try:
-        if not os.path.exists(m_path) or not os.path.exists(v_path):
-            print("❌ [BOOT ERROR] Asset files MISSING in deployment directory.")
-            return None, None, None
-            
-        with open(m_path, "rb") as f:
-            model = pickle.load(f)
-        with open(v_path, "rb") as f:
-            vectorizer = pickle.load(f)
-            
-        check_is_fitted(vectorizer, attributes=["idf_"])
-        sentiment = SentimentIntensityAnalyzer()
-        
-        print("✅ [BOOT SUCCESS] All assets verified and loaded.")
-        return model, vectorizer, sentiment
-    except Exception as e:
-        print(f"❌ [BOOT ERROR] Failed to load AI brain: {str(e)}")
-        return None, None, None
-
-model, vectorizer, sentiment_analyzer = load_assets()
-
-def clean_text(text):
-    text = text.lower()
-    text = text.translate(str.maketrans('', '', string.punctuation))
-    text = re.sub(r'\d+', '', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
-
-def compute_metrics(text):
-    words = re.findall(r'\w+', text.lower())
-    sens = round((sum(word in SENSATIONAL_WORDS for word in words) / max(len(words), 1)) * 100, 2)
-    click = sum(bool(re.search(p, text.lower())) for p in CLICKBAIT_PATTERNS)
-    exag = sum(phrase in text.lower() for phrase in HYPERBOLE_WORDS) + len(re.findall(r'\b\w+est\b', text.lower()))
-    vis = sum(word.isupper() and len(word) > 2 for word in text.split()) + text.count("!") + text.count("?")
-    emo = round(abs(sentiment_analyzer.polarity_scores(text)["compound"]), 2)
-    return {"sens": sens, "click": click, "exag": exag, "vis": vis, "emo": emo}
+from predict import predict_news
 
 def get_detailed_report(cred, m):
+    """Generates a human-readable report based on neural scores and style metrics"""
     reasons = []
+    # Metrics from predict.py use these keys: Sensationalism, Clickbait, Exaggeration, VisualEmphasis, EmotionalIntensity
     if cred >= 50:
         reasons.append(f"**Structural Validity**: The AI model verified the journalistic structure with **{cred}% confidence**.")
         reasons.append("**Balanced Framing**: The text follows professional editorial standards with minimal bias markers.")
-        if m['sens'] < 2: reasons.append("**Neutral Tone**: Avoids 'sensational' baiting words used in disinformation.")
+        if m['Sensationalism'] < 2: 
+            reasons.append("**Neutral Tone**: Avoids 'sensational' baiting words used in disinformation.")
     else:
         reasons.append(f"**Neural Match**: Linguistic fingerprints align significantly with documented misinformation patterns (**{100-cred}% mismatch**).")
         reasons.append("**Synthetic Indicators**: The syntactic structure suggests low factual density.")
-        if m['sens'] >= 3: reasons.append(f"**High Sensationalism**: Contains {m['sens']}% inflammatory vocabulary designed to bypass critical thinking.")
-        if m['click'] > 0: reasons.append("**Engagement Trap**: Clickbait framing identified in the semantic structure.")
-        if m['vis'] > 5: reasons.append("**Aggressive Formatting**: Excessive emphasis points (CAPS/Punctuation) detected.")
+        if m['Sensationalism'] >= 3: 
+            reasons.append(f"**High Sensationalism**: Contains {m['Sensationalism']}% inflammatory vocabulary designed to bypass critical thinking.")
+        if m['Clickbait'] > 0: 
+            reasons.append("**Engagement Trap**: Clickbait framing identified in the semantic structure.")
+        if m['VisualEmphasis'] > 5: 
+            reasons.append("**Aggressive Formatting**: Excessive emphasis points (CAPS/Punctuation) detected.")
     return reasons
 
 # ==========================================
@@ -270,26 +216,17 @@ with c2:
 if analyze:
     if not user_input.strip() or len(user_input) < 10:
         st.warning("⚠️ Please provide content for analysis.")
-    elif not model or not vectorizer:
-        st.error("""
-            🔍 **AI Brain Not Loaded**
-            The application couldn't load its trained model or vectorizer. 
-            This often happens due to version mismatches or missing files on the server.
-            
-            *Tip: Check the 'Manage App' logs for the specific boot error.*
-        """)
-        st.stop()
     else:
         with st.spinner("Analyzing neural signatures..."):
-            # Logic
-            cleaned = clean_text(user_input)
-            vec = vectorizer.transform([cleaned])
-            prob = model.predict_proba(vec)[0][1]
-            cred = round(prob * 100, 1)
-            metrics = compute_metrics(user_input)
-            report = get_detailed_report(cred, metrics)
+            # Call the extracted logic from predict.py
+            result = predict_news(user_input)
+            
+            if result:
+                cred = result["credibility"]
+                metrics = result["metrics"]
+                report = get_detailed_report(cred, metrics)
 
-            # BEAUTIFUL OUTPUT CONTAINER
+                # BEAUTIFUL OUTPUT CONTAINER
             st.markdown('<div class="output-container">', unsafe_allow_html=True)
             
             # 1. Main Verdict Highlight
@@ -338,8 +275,8 @@ if analyze:
                 fig.update_layout(height=240, margin=dict(t=0,b=0,l=20,r=20), paper_bgcolor='rgba(0,0,0,0)', font={'color': "white", 'family': "Inter"})
                 st.plotly_chart(fig, use_container_width=True)
                 
-                st.progress(min(metrics['sens']/10, 1.0), text=f"Sensationalism Index: {metrics['sens']}%")
-                st.progress(min(metrics['emo'], 1.0), text=f"Emotional Polarity: {int(metrics['emo']*100)}%")
+                st.progress(min(metrics['Sensationalism']/10, 1.0), text=f"Sensationalism Index: {metrics['Sensationalism']}%")
+                st.progress(min(metrics['EmotionalIntensity'], 1.0), text=f"Emotional Polarity: {int(metrics['EmotionalIntensity']*100)}%")
                 
                 st.markdown('</div>', unsafe_allow_html=True)
             
