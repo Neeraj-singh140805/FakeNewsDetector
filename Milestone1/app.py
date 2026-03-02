@@ -191,13 +191,28 @@ def load_assets():
     m_path = os.path.join(current_dir, "model.pkl")
     v_path = os.path.join(current_dir, "vectorizer.pkl")
     
+    # Debug: Print found paths to logs
+    print(f"[BOOT] Current Dir: {current_dir}")
+    print(f"[BOOT] Checking Model: {os.path.exists(m_path)}")
+    print(f"[BOOT] Checking Vectorizer: {os.path.exists(v_path)}")
+    
     try:
-        model = pickle.load(open(m_path, "rb"))
-        vectorizer = pickle.load(open(v_path, "rb"))
+        if not os.path.exists(m_path) or not os.path.exists(v_path):
+            print("❌ [BOOT ERROR] Asset files MISSING in deployment directory.")
+            return None, None, None
+            
+        with open(m_path, "rb") as f:
+            model = pickle.load(f)
+        with open(v_path, "rb") as f:
+            vectorizer = pickle.load(f)
+            
         check_is_fitted(vectorizer, attributes=["idf_"])
         sentiment = SentimentIntensityAnalyzer()
+        
+        print("✅ [BOOT SUCCESS] All assets verified and loaded.")
         return model, vectorizer, sentiment
-    except Exception:
+    except Exception as e:
+        print(f"❌ [BOOT ERROR] Failed to load AI brain: {str(e)}")
         return None, None, None
 
 model, vectorizer, sentiment_analyzer = load_assets()
@@ -255,6 +270,15 @@ with c2:
 if analyze:
     if not user_input.strip() or len(user_input) < 10:
         st.warning("⚠️ Please provide content for analysis.")
+    elif not model or not vectorizer:
+        st.error("""
+            🔍 **AI Brain Not Loaded**
+            The application couldn't load its trained model or vectorizer. 
+            This often happens due to version mismatches or missing files on the server.
+            
+            *Tip: Check the 'Manage App' logs for the specific boot error.*
+        """)
+        st.stop()
     else:
         with st.spinner("Analyzing neural signatures..."):
             # Logic
