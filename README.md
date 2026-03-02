@@ -214,6 +214,9 @@ This project demonstrates a practical fake-news detection system combining:
 It emphasizes **interpretable misinformation detection** rather than black-box prediction.
 
 ---
+# 15. Full Report 
+**Download Detailed Project Report (PDF)**
+👉 [View Report](Report.pdf)
 
 **Project:** Fake News Detection & Credibility Analysis  
 Machine Learning & NLP
