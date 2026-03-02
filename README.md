@@ -218,7 +218,8 @@ It emphasizes **interpretable misinformation detection** rather than black-box p
 **Download Detailed Project Report (PDF)**
 👉 [View Report](https://docs.google.com/document/d/13LvYFmwPuiNwCDpFqmzMKKnTkSV8Kdo8dl09d7lP6Zs/edit?tab=t.0#heading=h.1fgfvjnw2rp8)
 
+---
+# 16. Deployed Link:- 
+[LINK](https://fakenewsdetectorgit-hhwwpb9eqfzjj2uywqqmrw.streamlit.app/)
 
 
-**Project:** Fake News Detection & Credibility Analysis  
-Machine Learning & NLP
