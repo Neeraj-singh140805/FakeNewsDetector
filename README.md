@@ -131,3 +131,4 @@ FakeNewsDetector demonstrates a principled approach to modern AI: moving beyond 
 *   **Detailed Project Report**: [View Full Report (Milestone 2)](https://docs.google.com/document/d/1eG_hbjXOpaPncHS38r1wUVPsSy1UsUV_uNRKbbPPn80/edit?tab=t.0)
 *   **Milestone 1 Deployment**: [Access Here](https://fakenewsdetectorgit-hhwwpb9eqfzjj2uywqqmrw.streamlit.app/)
 *   **Dataset Source**: [ISOT Fake News Dataset (Kaggle)](https://www.kaggle.com/datasets/csmalarkodi/isot-fake-news-dataset)
+*   **Milestone 2 Deployment**: [Access Here](https://fakenewsdetector-wb6gzcc5fbimonu7cvgvvu.streamlit.app/)
