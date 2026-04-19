@@ -519,7 +519,7 @@ st.markdown("""
 <div class="top-nav">
 <div class="nav-logo">
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-TruthLens AI
+Fake News Detector
 </div>
 <div class="nav-status"><span></span> NEURAL NETWORK ONLINE</div>
 </div>
@@ -535,8 +535,8 @@ st.markdown("""
 </div>
 
 <h1 class="hero-title">
-<span class="highlight">Intelligence</span> that separates<br>
-fact from <span class="gradient-text">fiction.</span>
+<span class="highlight">Detecting</span> Fakes.<br>
+Delivering <span class="gradient-text"> Facts.</span>
 </h1>
 
 <p class="hero-subtitle">
