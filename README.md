@@ -1,4 +1,4 @@
-# 🛡️ FakeNewsDetector — Agentic AI News Credibility System
+# FakeNewsDetector — Agentic AI News Credibility System
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://fakenewsdetector-wb6gzcc5fbimonu7cvgvvu.streamlit.app/)
 
@@ -52,7 +52,7 @@ Milestone 1 focuses on the internal characteristics of the text.
 ## 4. Milestone 2 — Agentic AI Enhancements
 Milestone 2 adds external validation and reasoning capabilities.
 
-### 🚀 Key Features:
+### Key Features:
 *   **RAG Evidence Retrieval**: 
     *   Converts natural language claims into optimized keywords for the **News API**.
     *   Implements **dynamic retrieval** (no hardcoded filters) and **automatic fallback retries** if initial searches fail.
@@ -127,7 +127,7 @@ FakeNewsDetector/
 FakeNewsDetector demonstrates a principled approach to modern AI: moving beyond binary "black-box" classification toward **interpretable, evidence-grounded AI agents**. By combining the statistical reliability of ML with the contextual reasoning of LLMs, the system provides a robust tool for combating misinformation in the digital age.
 
 ---
-### 📄 Documentation & Links
+### Documentation & Links
 *   **Detailed Project Report**: [View Full Report (Milestone 2)](file:///Users/ayusharyan/Desktop/kUKuku/FakeNewsDetector/report.txt)
 *   **Milestone 1 Deployment**: [Access Here](https://fakenewsdetectorgit-hhwwpb9eqfzjj2uywqqmrw.streamlit.app/)
 *   **Dataset Source**: [ISOT Fake News Dataset (Kaggle)](https://www.kaggle.com/datasets/csmalarkodi/isot-fake-news-dataset)
